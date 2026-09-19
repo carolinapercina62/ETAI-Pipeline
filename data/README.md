@@ -52,3 +52,29 @@ error.
 | `two_year_recid` | binary | **target** -- was this person rearrested within two years? | `0` = no, `1` = yes |
 
 Source: derived from [propublica/compas-analysis](https://github.com/propublica/compas-analysis) (the data behind the "Machine Bias" investigation). Personally-identifying columns (name, date of birth, case numbers, charge descriptions) were removed.
+
+
+# Week 1
+
+
+### Hyperparameter Configuration
+To address convergence issues and ensure a controlled comparison, the models were trained with the following hyperparameter adjustments:
+* **Logistic Regression:** `max_iter = 1000`
+* **Decision Tree:** `max_depth = 5`, `min_samples_split = 10`
+
+### Performance and Fairness Comparison
+Focusing on the groups with the most statistically significant sample sizes (African-American, n=303; Caucasian, n=232), Table 1 summarizes the core metrics.
+
+| Metric | Logistic Regression | Decision Tree |
+| :--- | :---: | :---: |
+| Test Accuracy | 67.9% | 66.8% |
+| Train-Test Gap | 0.000 (No Overfitting) | +0.012 (Slight Overfitting) |
+| FPR (African-American) | 33% | 39% |
+| FPR (Caucasian) | 24% | 31% |
+| **FPR Difference** | **9 p.p.** | **8 p.p.** |
+
+*Table 1: Performance and False Positive Rate (FPR) comparison.*
+
+1. **Overall Performance:** Both models achieved a similar general accuracy of approximately 67%. The Logistic Regression proved slightly more robust, exhibiting zero train-test gap, whereas the Decision Tree showed a very minor tendency to overfit (+0.012).
+2. **Algorithmic Fairness:** Both models exhibited racial bias with higher False Positive Rates for African-American defendants (33% in LogReg, 39% in Decision Tree) compared to Caucasian defendants (24% in LogReg, 31% in Decision Tree).
+3. **Convergence Limitations (Logistic Regression):** Despite increasing the iterations to `max_iter = 1000`, the Logistic Regression model still triggered a convergence warning. This typically indicates that the dataset's features operate on vastly different scales. The optimal solution is not to increase iterations further, but to implement feature scaling in the preprocessing pipeline.
