@@ -78,3 +78,36 @@ Focusing on the groups with the most statistically significant sample sizes (Afr
 1. **Overall Performance:** Both models achieved a similar general accuracy of approximately 67%. The Logistic Regression proved slightly more robust, exhibiting zero train-test gap, whereas the Decision Tree showed a very minor tendency to overfit (+0.012).
 2. **Algorithmic Fairness:** Both models exhibited racial bias with higher False Positive Rates for African-American defendants (33% in LogReg, 39% in Decision Tree) compared to Caucasian defendants (24% in LogReg, 31% in Decision Tree).
 3. **Convergence Limitations (Logistic Regression):** Despite increasing the iterations to `max_iter = 1000`, the Logistic Regression model still triggered a convergence warning. This typically indicates that the dataset's features operate on vastly different scales. The optimal solution is not to increase iterations further, but to implement feature scaling in the preprocessing pipeline.
+
+# Week 2
+
+### Hyperparameter Configuration
+
+To address convergence issues and ensure a controlled comparison, the models were trained with the following hyperparameter adjustments:
+
+*   **Logistic Regression:** `max_iter = 2000`
+*   **Decision Tree:** Default configuration (no depth limits, `params={}`)
+
+### Performance and Fairness Comparison
+
+Focusing on the groups with the most statistically significant sample sizes (African-American, n=349; Caucasian, n=290), the table below summarizes the main metrics from our test.
+
+| Metric | Logistic Regression | Decision Tree |
+| :--- | :--- | :--- |
+| **Accuracy (Test)** | 65.7% | 61.1% |
+| **Train-Test Gap** | +0.019 (Stable) | +0.181 (Strong Overfitting) |
+| **FPR (African-American)** | 28% | 32% |
+| **FPR (Caucasian)** | 14% | 23% |
+| **FPR Gap (Bias)** | **14 p.p.** | **9 p.p.** |
+
+*Table 1: Performance and False Positive Rate (FPR) Comparison.*
+
+#### Results Analysis
+
+*   **Overall Performance:** Logistic Regression achieved the best accuracy (~66%) and showed excellent stability (virtually no gap between train and test). On the other hand, the Decision Tree suffered from severe overfitting (it memorized the training data with 79.2% accuracy, but performance dropped drastically to 61.1% on the test set).
+*   **Algorithmic Fairness:** Both models continue to show racial bias, predicting false positives (FPR) at a much higher rate for African-American defendants than for Caucasian ones. Although Logistic Regression makes fewer overall errors, the disparity between the two races is sharper in this model (a 14 percentage point gap).
+*   **Baseline Comparison (COMPAS):** Despite the highlighted bias issues, our models show lower false positive rates than the original proprietary COMPAS system (which recorded a 44% FPR for African-Americans and 24% for Caucasians in this same sample). 
+
+### Limitations and Next Steps
+
+*   **Decision Tree Overfitting:** The high gap between training and testing indicates that the Decision Tree grew too much and memorized noise. The ideal solution for the next iteration is to limit the model's complexity by introducing regularization hyperparameters like `max_depth` or `min_samples_split`.
