@@ -111,3 +111,32 @@ Focusing on the groups with the most statistically significant sample sizes (Afr
 ### Limitations and Next Steps
 
 *   **Decision Tree Overfitting:** The high gap between training and testing indicates that the Decision Tree grew too much and memorized noise. The ideal solution for the next iteration is to limit the model's complexity by introducing regularization hyperparameters like `max_depth` or `min_samples_split`.
+
+# week 3
+
+### Hyperparameter Configuration
+
+The models were trained (and tuned where indicated) with the following configurations:
+
+*   **Decision Tree:** `max_depth = 6`, `min_samples_leaf = 101`, `criterion = 'gini'` *(after tuning)*
+*   **Logistic Regression:** Default parameters
+*   **Random Forest:** Default parameters (`random_state = 42`)
+*   **Dummy:** `strategy = 'most_frequent'`
+
+### Performance and Fairness Comparison
+
+Focusing on the groups with the most statistically significant sample sizes (African-American, n=1420; Caucasian, n=1161), Table 1 summarizes the core metrics obtained during cross-validation.
+
+| Metric | Logistic Regression | Decision Tree | Random Forest | Dummy (Baseline) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Validation Accuracy** | 67.2% | 67.2% | 64.7% | 54.9% |
+| **Train-Validation Gap** | +0.003 (No Overfitting) | +0.013 (Slight Overfitting) | +0.085 (Overfitting) | 0.000 |
+| **FPR (African-American)** | 26% | 29% | 35% | 0% |
+| **FPR (Caucasian)** | 13% | 17% | 23% | 0% |
+| **FPR Difference** | **13 p.p.** | **12 p.p.** | **12 p.p.** | **0 p.p.** |
+
+*Table 1: Performance and False Positive Rate (FPR) comparison.*
+
+1. **Overall Performance:** Logistic Regression and Decision Tree achieved the highest accuracy, both at 67.2%. Logistic Regression proved to be the most stable and robust, showing a near-zero train-validation gap (+0.003), whereas the Random Forest clearly suffered from overfitting (+0.085).
+2. **Algorithmic Fairness:** All predictive models exhibited clear racial bias. The False Positive Rate (individuals who did not reoffend, but the model predicted they would) is consistently higher for African-American defendants compared to Caucasian defendants, with a systematic difference of 12 to 13 percentage points.
+3. **Baseline Behavior (Dummy):** The 54.9% accuracy reflects the majority class distribution. Its FPR is zero across all groups because this model simply predicted "0" (no reoffense) for every individual in the sample.
